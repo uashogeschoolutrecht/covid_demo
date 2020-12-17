@@ -3,7 +3,7 @@ title: "Covid cases and deaths for selected countries and months"
 author: "Marc A.T. Teunis"
 date: "`r Sys.time()`"
 output:
-  github_document
+  html_document
 params:
   geo_id: NL BE
   month: April May June July August September October November December
