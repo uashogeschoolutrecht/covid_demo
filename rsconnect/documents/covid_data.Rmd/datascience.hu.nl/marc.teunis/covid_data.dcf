@@ -1,0 +1,12 @@
+name: covid_data
+title: covid_data
+username: marc.teunis
+account: marc.teunis
+server: datascience.hu.nl
+hostUrl: https://datascience.hu.nl/rsconnect/__api__
+appId: 8
+bundleId: 10
+url: http://datascience.hu.nl:80/rsconnect/content/8/
+when: 1608216639.92604
+asMultiple: FALSE
+asStatic: TRUE

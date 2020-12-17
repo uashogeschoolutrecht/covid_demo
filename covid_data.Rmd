@@ -1,16 +1,12 @@
-
 ---
-title: "`r paste('Covid Cases for', params$month, 'in', params$geo_id)`"
+title: "Covid cases and deaths for selected countries and months"
 author: "Marc A.T. Teunis"
 date: "`r Sys.time()`"
 output:
-  html_document: default
-  powerpoint_presentation: default
-  word_document: default
-  pdf_document: default
+  github_document
 params:
   geo_id: NL BE
-  month: April May June July August September
+  month: April May June July August September October November December
   year: 2020
 ---
 
@@ -24,34 +20,58 @@ knitr::opts_chunk$set(
   )
 ```
 
-
-```{r}
 ## Packages
+```{r, echo=TRUE}
 library(utils)
 library(tidyverse)
 library(tools)
+library(glue)
+library(blscrapeR)
 ```
 
-```{r, echo=TRUE}
+## Selections
+```{r, results='asis'}
+m_names <- str_split(tolower(params$month), pattern = " ") %>% 
+    unlist() %>%
+    enframe() 
+
+cat("The data was filtered for months:",
+firstupper(m_names$value))
+```
+
+```{r, results='asis'}
+geo_ids <- str_split(string = params$geo_id, pattern = " ") %>% unlist()
+cat("The data is displayed for countries:",
+geo_ids)
+```
+
 ## Data
-#read the Dataset sheet into “R”. The dataset will be called "data".
-#data <- read_csv(
-#  "https://opendata.ecdc.europa.eu/covid19/casedistribution/csv", 
-#  na = "")
-source(
-  here::here(
-    "data-raw",
-    "D010",
-    "supporting",
-    "covid_ecdc_cases_geography.R"))
+Download data from European Center for Disease Prevention and Control [ECDC](https://www.ecdc.europa.eu/en)
+```{r, echo=TRUE}
+## Read data from public url to csv file
+data <- readr::read_csv(
+  "https://opendata.ecdc.europa.eu/covid19/casedistribution/csv/data.csv", 
+  na = c("", " "))
+data
 ```
 
+## Data cleaning
+```{r, echo=TRUE}
+data <- data %>%
+  mutate(
+    date = lubridate::dmy(dateRep),
+    ) %>%
+  separate(
+    col = date, 
+    into = c("year", "month", "day"), remove = FALSE) %>%
+  mutate(
+    month = as.integer(month)
+  )
 
-```{r, include=FALSE}
 ## Filter for `r params$month` and `r params$geo_id`
 ## create a conversion table to go from month name to month integer
 convert_months <- tibble(
-  month_name = c(
+  month = c(
     "january",
     "february",
     "march",
@@ -65,14 +85,12 @@ convert_months <- tibble(
     "november",
     "december"),
   month_number = c(1:12))
-  m_names <- str_split(tolower(params$month), pattern = " ") %>% unlist()
+
   month_id <- convert_months %>%
     dplyr::filter(
-      month_name %in% m_names) %>% 
-    dplyr::select(month_number)
-  
-  id <- month_id$month_number
-geo_ids <- str_split(string = params$geo_id, pattern = " ") %>% unlist()
+      month %in% m_names$value) 
+id <- month_id$month_number
+
 data_filter <- data %>%
   dplyr::filter(
     month %in% id,
@@ -83,49 +101,86 @@ char_col <- map_lgl(
   .x = data_filter,
   .f = is.numeric 
 )
-map(
-  .x = data_filter[, !char_col],
-  .f = unique
-)
+
 country_names <- data_filter$countriesAndTerritories %>% unique() %>%
   paste(collapse = ", ")
+
 Caps <- function(x) {
 s <- strsplit(x, " ")[[1]]
 paste(toupper(substring(s, 1,1)), substring(s, 2),
 sep="", collapse=" ")
 }
-cap_cases <- paste("Cases for", params$month, "and", country_names)
+
+range <- data_filter$month %>% unique() %>% enframe() %>%
+  arrange(value)
+
+month_df <- left_join(range, convert_months, by = c("value" = "month_number")) %>%
+  dplyr::mutate(month = firstupper(month))
+
+min_month <- month_df %>%
+  dplyr::filter(value == min(month_df$value))
+
+countries_vec <- str_split(
+  country_names, 
+  pattern = ",", 
+  simplify = FALSE
+  ) %>%
+  unlist() %>%
+  trimws() %>%
+  blscrapeR::firstupper()  
+  
+
+max_month <- month_df %>%
+  dplyr::filter(value == max(month_df$value))
+
+cap_cases <- paste(
+  "COVID-19 positive cases from", 
+  min_month$month, "to", max_month$month,
+  "for", glue_collapse(countries_vec, ", ", last = " and ")
+)
+
+cap_deaths <- paste(
+  "COVID-19 related deaths from", 
+  min_month$month, "to", max_month$month,
+  "for", glue_collapse(countries_vec, ", ", last = " and ")
+)
+
+
+data_filter  
 ```
 
 ## Cases
-```{r, fig.cap= cap_cases}
-data_filter_agr <- data_filter %>% 
-  mutate(date_time = lubridate::dmy(dateRep)) %>%
-group_by(week = cut(date_time, "week"), geoId) %>% summarise(value = sum(cases)) 
-
-#names(data_filter)
-plot_cases <- data_filter_agr %>%
-  ggplot(aes(x = week, y = value)) +
+```{r, fig.cap=cap_cases, echo=TRUE}
+Sys.setlocale("LC_TIME", "English")
+plot_cases <- data_filter %>%
+  na.omit() %>%
+  ggplot(aes(x = date, y = cases_weekly)) +
   geom_point(aes(colour = geoId)) +
-  geom_line(aes(group = geoId, colour = geoId))
-  plot_cases + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  geom_line(aes(group = geoId, colour = geoId)) +
+  xlab("Date") +
+  ylab("COVID-19 positive tested cases") +
+  scale_x_date(breaks="month", date_labels = "%b") +
+  xlab(NULL) +
+  theme_bw()
+
+plot_cases
 ```
 
 ## Deaths
-```{r, fig.cap=paste("Deaths for", params$month, "and" , country_names)}
-data_filter_deaths_agr <- data_filter %>% 
-  mutate(date_time = lubridate::dmy(dateRep))  %>%
-group_by(week = cut(date_time, "week"), geoId) %>% 
-  summarise(value = sum(deaths)) 
+```{r, fig.cap=cap_deaths, echo=TRUE}
+## setting month abbreviations to "English"
+Sys.setlocale("LC_TIME", "English")
 
-#names(data_filter)
-plot <- data_filter_deaths_agr %>%
-  ggplot(aes(x = week, y = value)) +
+plot_deaths <- data_filter %>%
+  ggplot(aes(x = date, y = deaths_weekly)) +
   geom_point(aes(colour = geoId)) +
-  geom_line(aes(group = geoId, colour = geoId)) + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-  
-plot
-```
+  geom_line(aes(group = geoId, colour = geoId))  +
+  xlab("Date") +
+  ylab("COVID-19 related deaths") +
+  scale_x_date(breaks="month", date_labels = "%b") +
+  xlab(NULL) +
+  theme_bw()
 
+plot_deaths
+
+```
