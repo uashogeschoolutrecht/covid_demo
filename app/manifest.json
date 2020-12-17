@@ -1131,35 +1131,6 @@
         "Built": "R 4.0.2; x86_64-w64-mingw32; 2020-07-07 00:16:14 UTC; windows"
       }
     },
-    "here": {
-      "Source": "CRAN",
-      "Repository": "https://cran.rstudio.com/",
-      "description": {
-        "Package": "here",
-        "Title": "A Simpler Way to Find Your Files",
-        "Version": "1.0.0",
-        "Date": "2020-11-15",
-        "Authors@R": "\n    c(person(given = \"Kirill\",\n             family = \"M\\u00fcller\",\n             role = c(\"aut\", \"cre\"),\n             email = \"krlmlr+r@mailbox.org\",\n             comment = c(ORCID = \"0000-0002-1416-3412\")),\n      person(given = \"Jennifer\",\n             family = \"Bryan\",\n             role = \"ctb\",\n             email = \"jenny@rstudio.com\",\n             comment = c(ORCID = \"0000-0002-6983-2759\")))",
-        "Description": "Constructs paths to your project's files.\n    Declare the relative path of a file within your project with 'i_am()'.\n    Use the 'here()' function as a drop-in replacement for 'file.path()',\n    it will always locate the files relative to your project root.",
-        "License": "MIT + file LICENSE",
-        "URL": "https://here.r-lib.org/, https://github.com/r-lib/here",
-        "BugReports": "https://github.com/r-lib/here/issues",
-        "Imports": "rprojroot (>= 2.0.1)",
-        "Suggests": "conflicted, covr, fs, knitr, palmerpenguins, plyr, readr,\nrmarkdown, testthat, uuid, withr",
-        "VignetteBuilder": "knitr",
-        "Encoding": "UTF-8",
-        "LazyData": "true",
-        "RoxygenNote": "7.1.1.9000",
-        "Config/testthat/edition": "3",
-        "NeedsCompilation": "no",
-        "Packaged": "2020-11-15 14:39:44 UTC; kirill",
-        "Author": "Kirill Müller [aut, cre] (<https://orcid.org/0000-0002-1416-3412>),\n  Jennifer Bryan [ctb] (<https://orcid.org/0000-0002-6983-2759>)",
-        "Maintainer": "Kirill Müller <krlmlr+r@mailbox.org>",
-        "Repository": "CRAN",
-        "Date/Publication": "2020-11-15 17:10:02 UTC",
-        "Built": "R 4.0.3; ; 2020-11-15 19:01:59 UTC; windows"
-      }
-    },
     "highr": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com/",
@@ -2934,62 +2905,8 @@
     }
   },
   "files": {
-    "covid_data.md": {
-      "checksum": "018d39e489978265c6450dcb92b7a187"
-    },
-    "covid_data.pdf": {
-      "checksum": "9a8b90b03320d11568492f85455f69c5"
-    },
     "covid_data.Rmd": {
       "checksum": "850a134a11aac875bebfecf855f40f96"
-    },
-    "covid_data_files/figure-gfm/unnamed-chunk-4-1.png": {
-      "checksum": "31e1023acfcb1cb1b748a87293b5be59"
-    },
-    "covid_data_files/figure-gfm/unnamed-chunk-5-1.png": {
-      "checksum": "31e1023acfcb1cb1b748a87293b5be59"
-    },
-    "covid_data_files/figure-gfm/unnamed-chunk-6-1.png": {
-      "checksum": "9ca65a14be4dfc58ab14aaa48971b52a"
-    },
-    "covid_data_files/figure-gfm/unnamed-chunk-7-1.png": {
-      "checksum": "660ae1fa2638800c150affb7dfbb3c55"
-    },
-    "covid_data_files/figure-markdown_strict/unnamed-chunk-4-1.png": {
-      "checksum": "e9a0dc1c48b0b40d426e92541ee47442"
-    },
-    "covid_data_files/figure-markdown_strict/unnamed-chunk-5-1.png": {
-      "checksum": "7fc343938b74443fe89677455caf7907"
-    },
-    "data-raw/D010/2020-06-19_covid_ecdc_cases_geography.csv": {
-      "checksum": "4f4675de9fcea13a3fbfeb5e498c3cbc"
-    },
-    "data-raw/D010/2020-06-19_md5sums_covid_ecdc_cases_geography.md5": {
-      "checksum": "361ac12af678ca08cd48d91243f3f5e0"
-    },
-    "data-raw/D010/README.txt": {
-      "checksum": "90f27a5b16ef4b9ed2d1f8e0db7271b8"
-    },
-    "data-raw/D010/supporting/covid_ecdc_cases_geography.R": {
-      "checksum": "910e9a05af8f2ed10d056440ff8e9aea"
-    },
-    "data-raw/D010/supporting/md5sums.R": {
-      "checksum": "80ad9c2cd5c351676f5d7227b65c8936"
-    },
-    "data-raw/D010/v01/2020-05-31_covid_ecdc_cases_geography.csv": {
-      "checksum": "f0ff58bfe2be97bea4e96eedbdf758b0"
-    },
-    "data-raw/D010/v01/2020-05-31_md5sums_covid_ecdc_cases_geography.md5": {
-      "checksum": "da22274d6ad1f52ea738242275176ebc"
-    },
-    "data-raw/D020/messy_excel.xlsx": {
-      "checksum": "8bc16ec7781f805ce8cb9245fa03232f"
-    },
-    "data-raw/D020/README.txt": {
-      "checksum": "587c334506572a52250a40dc5e081a63"
-    },
-    "LICENSE": {
-      "checksum": "473a7959b44c2f42c375d904305b6307"
     },
     "packrat/desc/askpass": {
       "checksum": "ac2e7ad76fa8fa80754731c84c9d5918"
@@ -3098,9 +3015,6 @@
     },
     "packrat/desc/haven": {
       "checksum": "c05d3771b59288629739f0cbfe650b4c"
-    },
-    "packrat/desc/here": {
-      "checksum": "9f95176d9fa08596de71b55cef62c946"
     },
     "packrat/desc/highr": {
       "checksum": "99e0e8caec4fd959349fa8f532d8c2db"
@@ -3313,10 +3227,7 @@
       "checksum": "a1feb9d6769146dfb7fbc5248f503280"
     },
     "packrat/packrat.lock": {
-      "checksum": "311c5734496f5fa654d3b3e4d829eab3"
-    },
-    "README.md": {
-      "checksum": "923d232e5515279f1a2666cb2ee0b1d9"
+      "checksum": "1c9086cb0b4009e2064f33d9f27f68db"
     }
   },
   "users": null
