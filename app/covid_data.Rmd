@@ -5,8 +5,8 @@ date: "`r Sys.time()`"
 output:
   html_document
 params:
-  geo_id: NL BE
-  month: April May June July August September October November December
+  geo_id: NL DE
+  months_from_to: September December
   year: 2020
 ---
 
@@ -29,22 +29,6 @@ library(glue)
 library(blscrapeR)
 ```
 
-## Selections
-```{r, results='asis'}
-m_names <- str_split(tolower(params$month), pattern = " ") %>% 
-    unlist() %>%
-    enframe() 
-
-cat("The data was filtered for months:",
-firstupper(m_names$value))
-```
-
-```{r, results='asis'}
-geo_ids <- str_split(string = params$geo_id, pattern = " ") %>% unlist()
-cat("The data is displayed for countries:",
-geo_ids)
-```
-
 ## Data
 Download data from European Center for Disease Prevention and Control [ECDC](https://www.ecdc.europa.eu/en)
 ```{r, echo=TRUE}
@@ -53,6 +37,30 @@ data <- readr::read_csv(
   "https://opendata.ecdc.europa.eu/covid19/casedistribution/csv/data.csv", 
   na = c("", " "))
 data
+```
+
+## Selections
+```{r, results='asis'}
+m_names <- str_split(tolower(params$months_from_to), pattern = " ") %>% 
+    unlist() %>%
+    enframe() 
+
+cat("The data was filtered for",
+firstupper(m_names$value[1]), "to", firstupper(m_names$value[2]), 
+"in", params$year)
+```
+
+```{r, results='asis'}
+geo_ids <- str_split(string = params$geo_id, pattern = " ") %>% unlist()
+
+countries <- data %>%
+  dplyr::filter(geoId %in% geo_ids) %>%
+  dplyr::select(countriesAndTerritories) %>%
+  unlist() %>%
+  unique() %>%
+  as.character()
+
+cat("The data is displayed for", glue_collapse(countries, ", ", last = " and "))
 ```
 
 ## Data cleaning
@@ -89,7 +97,7 @@ convert_months <- tibble(
   month_id <- convert_months %>%
     dplyr::filter(
       month %in% m_names$value) 
-id <- month_id$month_number
+id <- c(min(month_id$month_number): max(month_id$month_number))
 
 data_filter <- data %>%
   dplyr::filter(
