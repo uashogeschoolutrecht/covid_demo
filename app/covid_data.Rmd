@@ -45,6 +45,7 @@ data
 ```{r, fig.height=25, fig.width=18}
 source(
   here::here(
+    "app",
     "shiny",
     "app.R"
   )
