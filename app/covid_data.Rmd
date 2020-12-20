@@ -2,6 +2,7 @@
 title: "Covid cases and deaths for selected countries and months"
 author: "Marc A.T. Teunis"
 date: "`r Sys.time()`"
+runtime: shiny
 output:
   html_document
 params:
@@ -38,6 +39,20 @@ data <- readr::read_csv(
   na = c("", " "))
 data
 ```
+
+
+## Interactive plot
+```{r, fig.height=25, fig.width=18}
+source(
+  here::here(
+    "shiny",
+    "app.R"
+  )
+)
+
+covid_app() 
+```
+
 
 ## Selections
 ```{r, results='asis'}
@@ -192,3 +207,4 @@ plot_deaths <- data_filter %>%
 plot_deaths
 
 ```
+
