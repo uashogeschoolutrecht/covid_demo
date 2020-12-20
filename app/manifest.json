@@ -3,7 +3,7 @@
   "locale": "nl_NL",
   "platform": "4.0.3",
   "metadata": {
-    "appmode": "rmd-static",
+    "appmode": "rmd-shiny",
     "primary_rmd": "covid_data.Rmd",
     "primary_html": null,
     "content_category": null,
@@ -1129,6 +1129,35 @@
         "Repository": "CRAN",
         "Date/Publication": "2020-06-01 15:00:06 UTC",
         "Built": "R 4.0.2; x86_64-w64-mingw32; 2020-07-07 00:16:14 UTC; windows"
+      }
+    },
+    "here": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "description": {
+        "Package": "here",
+        "Title": "A Simpler Way to Find Your Files",
+        "Version": "1.0.0",
+        "Date": "2020-11-15",
+        "Authors@R": "\n    c(person(given = \"Kirill\",\n             family = \"M\\u00fcller\",\n             role = c(\"aut\", \"cre\"),\n             email = \"krlmlr+r@mailbox.org\",\n             comment = c(ORCID = \"0000-0002-1416-3412\")),\n      person(given = \"Jennifer\",\n             family = \"Bryan\",\n             role = \"ctb\",\n             email = \"jenny@rstudio.com\",\n             comment = c(ORCID = \"0000-0002-6983-2759\")))",
+        "Description": "Constructs paths to your project's files.\n    Declare the relative path of a file within your project with 'i_am()'.\n    Use the 'here()' function as a drop-in replacement for 'file.path()',\n    it will always locate the files relative to your project root.",
+        "License": "MIT + file LICENSE",
+        "URL": "https://here.r-lib.org/, https://github.com/r-lib/here",
+        "BugReports": "https://github.com/r-lib/here/issues",
+        "Imports": "rprojroot (>= 2.0.1)",
+        "Suggests": "conflicted, covr, fs, knitr, palmerpenguins, plyr, readr,\nrmarkdown, testthat, uuid, withr",
+        "VignetteBuilder": "knitr",
+        "Encoding": "UTF-8",
+        "LazyData": "true",
+        "RoxygenNote": "7.1.1.9000",
+        "Config/testthat/edition": "3",
+        "NeedsCompilation": "no",
+        "Packaged": "2020-11-15 14:39:44 UTC; kirill",
+        "Author": "Kirill Müller [aut, cre] (<https://orcid.org/0000-0002-1416-3412>),\n  Jennifer Bryan [ctb] (<https://orcid.org/0000-0002-6983-2759>)",
+        "Maintainer": "Kirill Müller <krlmlr+r@mailbox.org>",
+        "Repository": "CRAN",
+        "Date/Publication": "2020-11-15 17:10:02 UTC",
+        "Built": "R 4.0.3; ; 2020-11-15 19:01:59 UTC; windows"
       }
     },
     "highr": {
@@ -2905,8 +2934,17 @@
     }
   },
   "files": {
+    "covid_data.html": {
+      "checksum": "198d9567cf61aee89443b18d97821b0c"
+    },
     "covid_data.Rmd": {
-      "checksum": "850a134a11aac875bebfecf855f40f96"
+      "checksum": "5e478ea04aed009fedbade2b8e8eaa9c"
+    },
+    "covid_data_files/figure-html/unnamed-chunk-6-1.png": {
+      "checksum": "4eadbb33349115ffdcaca2e717a2b374"
+    },
+    "covid_data_files/figure-html/unnamed-chunk-7-1.png": {
+      "checksum": "b4b2860f2d71facc437e5a764d10a525"
     },
     "packrat/desc/askpass": {
       "checksum": "ac2e7ad76fa8fa80754731c84c9d5918"
@@ -3015,6 +3053,9 @@
     },
     "packrat/desc/haven": {
       "checksum": "c05d3771b59288629739f0cbfe650b4c"
+    },
+    "packrat/desc/here": {
+      "checksum": "9f95176d9fa08596de71b55cef62c946"
     },
     "packrat/desc/highr": {
       "checksum": "99e0e8caec4fd959349fa8f532d8c2db"
@@ -3227,7 +3268,7 @@
       "checksum": "a1feb9d6769146dfb7fbc5248f503280"
     },
     "packrat/packrat.lock": {
-      "checksum": "1c9086cb0b4009e2064f33d9f27f68db"
+      "checksum": "311c5734496f5fa654d3b3e4d829eab3"
     }
   },
   "users": null
