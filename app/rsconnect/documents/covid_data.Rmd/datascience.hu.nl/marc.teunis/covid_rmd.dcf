@@ -1,0 +1,12 @@
+name: covid_rmd
+title: covid_rmd
+username: marc.teunis
+account: marc.teunis
+server: datascience.hu.nl
+hostUrl: https://datascience.hu.nl/rsconnect/__api__
+appId: 30
+bundleId: 104
+url: https://datascience.hu.nl:443/rsconnect/covid_rmd/
+when: 1611652979.85843
+asMultiple: FALSE
+asStatic: FALSE

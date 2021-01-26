@@ -1,7 +1,6 @@
 #install.packages( "maps", dependencies = TRUE) #run this to install R package maps
 ################################- warning this will update existing packages if already installed
 
-covid_app <- function(){
 
 #*save the following code in a file named app.R *
 library(shiny)
@@ -104,7 +103,7 @@ server = shinyServer(function(input, output) {
   
   output$plot1 = renderPlot({ #creates a the plot to go in the mainPanel
     
-  p2 <- data %>%
+  cases_plot <- data %>%
       dplyr::filter(
         continentExp == input$continent,
         countriesAndTerritories == input$country
@@ -116,14 +115,14 @@ server = shinyServer(function(input, output) {
         )
       ) +
       geom_point() +
-      geom_line(colour = "purple") +
+      geom_line(colour = "purple", size = 1) +
       ggtitle(
         paste("COVID-19 cases for", 
               input$country))
     #+
      # toolboxr::rotate_axis_labels("x", angle = 90)
 
-    p1 <-  data %>%
+    casualties_plot <-  data %>%
         dplyr::filter(
           continentExp == input$continent,
           countriesAndTerritories == input$country
@@ -135,13 +134,16 @@ server = shinyServer(function(input, output) {
           )
         ) +
         geom_point() +
-        geom_line(colour = "darkred") +
+        geom_line(colour = "darkred", size = 1) +
         ggtitle(
           paste("COVID-19 related deaths for", 
                 input$country))
       
   
-      cowplot::plot_grid(p1, p2, ncol = 1)
+      cowplot::plot_grid(
+        cases_plot,
+        casualties_plot,
+        ncol = 1)
         
   })
   
@@ -153,4 +155,3 @@ shinyApp(ui = ui, server = server) #need this if combining ui and server into on
 
 
 
-}

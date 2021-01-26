@@ -2,13 +2,14 @@
 title: "Covid cases and deaths for selected countries and months"
 author: "Marc A.T. Teunis"
 date: "`r Sys.time()`"
+output: html_document
 runtime: shiny
-output:
-  html_document
 params:
   geo_id: NL DE
-  months_from_to: September December
+  months_from_to: October November
   year: 2020
+resource_files:
+- shiny/app.R
 ---
 
 ```{r setup, include=FALSE}
@@ -19,10 +20,11 @@ knitr::opts_chunk$set(
   error = FALSE
   
   )
+
 ```
 
 ## Packages
-```{r, echo=TRUE}
+```{r}
 library(utils)
 library(tidyverse)
 library(tools)
@@ -32,28 +34,13 @@ library(blscrapeR)
 
 ## Data
 Download data from European Center for Disease Prevention and Control [ECDC](https://www.ecdc.europa.eu/en)
-```{r, echo=TRUE}
+```{r, echo=TRUE, results='hide'}
 ## Read data from public url to csv file
 data <- readr::read_csv(
   "https://opendata.ecdc.europa.eu/covid19/casedistribution/csv/data.csv", 
   na = c("", " "))
 data
 ```
-
-
-## Interactive plot
-```{r, fig.height=25, fig.width=18}
-source(
-  here::here(
-    "app",
-    "shiny",
-    "app.R"
-  )
-)
-
-covid_app() 
-```
-
 
 ## Selections
 ```{r, results='asis'}
@@ -80,7 +67,7 @@ cat("The data is displayed for", glue_collapse(countries, ", ", last = " and "))
 ```
 
 ## Data cleaning
-```{r, echo=TRUE}
+```{r}
 data <- data %>%
   mutate(
     date = lubridate::dmy(dateRep),
@@ -174,8 +161,8 @@ data_filter
 ```
 
 ## Cases
-```{r, fig.cap=cap_cases, echo=TRUE}
-Sys.setlocale("LC_TIME", "English")
+```{r, fig.cap=cap_cases}
+#Sys.setlocale("LC_TIME", "English")Sys.setlocale("LC_TIME", "English")Sys.setlocale("LC_TIME", "English")
 plot_cases <- data_filter %>%
   na.omit() %>%
   ggplot(aes(x = date, y = cases_weekly)) +
@@ -191,9 +178,9 @@ plot_cases
 ```
 
 ## Deaths
-```{r, fig.cap=cap_deaths, echo=TRUE}
+```{r, fig.cap=cap_deaths}
 ## setting month abbreviations to "English"
-Sys.setlocale("LC_TIME", "English")
+#Sys.setlocale("LC_TIME", "English")
 
 plot_deaths <- data_filter %>%
   ggplot(aes(x = date, y = deaths_weekly)) +
@@ -207,5 +194,18 @@ plot_deaths <- data_filter %>%
 
 plot_deaths
 
+```
+
+## Interactive plot
+```{r, fig.height=25, fig.width=18, eval=FALSE}
+source(
+  here::here(
+    "app",
+    "shiny",
+    "app.R"
+  )
+)
+
+shinyApp(ui = ui, server = server)
 ```
 

@@ -1,0 +1,12 @@
+name: covid-app
+title: covid-app
+username: marc.teunis
+account: marc.teunis
+server: datascience.hu.nl
+hostUrl: https://datascience.hu.nl/rsconnect/__api__
+appId: 24
+bundleId: 40
+url: http://datascience.hu.nl:80/rsconnect/content/24/
+when: 1608500901.29125
+asMultiple: FALSE
+asStatic: FALSE
