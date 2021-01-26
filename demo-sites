@@ -1,8 +1,15 @@
 ## demo sites:
 
+## docs
 https://datascience.hu.nl
 
+## RStudio::CONNECT server
 https://datascience.hu.nl/rsconnect
+
+## RMarkdown
+https://bookdown.org/yihui/rmarkdown/
+https://achale.gitlab.io/tutorialmarkdownthesis/
+https://rmarkdown.rstudio.com/
 
 ## static covid example
 https://datascience.hu.nl/rsconnect/covid_rmd/

@@ -9,7 +9,7 @@ params:
   months_from_to: October November
   year: 2020
 resource_files:
-- shiny/app.R
+- app/shiny/app.R
 ---
 
 ```{r setup, include=FALSE}
