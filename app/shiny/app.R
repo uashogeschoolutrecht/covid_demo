@@ -161,7 +161,7 @@ App author: Marc A.T. Teunis, 2021 [CC-BY/NC]")
         colour = "darkred", 
         size = 2, 
         linetype = "dashed") +
-      scale_y_log10() +
+   #   scale_y_log10() +
       theme_bw()
     
       
@@ -190,7 +190,7 @@ App author: Marc A.T. Teunis, 2021 [CC-BY/NC]")
         paste("Cumulative anti-SARS-CoV2 vaccinations", 
               input$country)) +
       ylab("Total count per week") +
-      scale_y_log10() +
+  #    scale_y_log10() +
       theme_bw()
     
       
