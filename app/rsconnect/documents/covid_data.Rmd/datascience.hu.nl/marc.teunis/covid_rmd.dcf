@@ -5,8 +5,8 @@ account: marc.teunis
 server: datascience.hu.nl
 hostUrl: https://datascience.hu.nl/rsconnect/__api__
 appId: 30
-bundleId: 104
+bundleId: 257
 url: https://datascience.hu.nl:443/rsconnect/covid_rmd/
-when: 1611652979.85843
+when: 1616787311.45249
 asMultiple: FALSE
 asStatic: FALSE

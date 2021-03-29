@@ -1,13 +1,12 @@
 ---
 title: "Covid cases and deaths for selected countries and months"
-author: "Marc A.T. Teunis"
+author: "Marc A.T. Teunis, PhD"
 date: "`r Sys.time()`"
 output: html_document
 runtime: shiny
 params:
-  geo_id: NL DE
-  months_from_to: October November
-  year: 2020
+  country_code: NLD BEL
+  from_to_date: 2020-01-01 2021-04-01
 resource_files:
 - app/shiny/app.R
 ---
@@ -30,35 +29,124 @@ library(tidyverse)
 library(tools)
 library(glue)
 library(blscrapeR)
+library(aweek)
+library(lubridate)
 ```
 
 ## Data
 Download data from European Center for Disease Prevention and Control [ECDC](https://www.ecdc.europa.eu/en)
+
+[The link to the data file](https://opendata.ecdc.europa.eu/covid19/nationalcasedeath/csv)
+
+[Data Dictionary](https://www.ecdc.europa.eu/sites/default/files/documents/2021-01-13_Variable_Dictionary_and_Disclaimer_national_weekly_data.pdf) 
+
+See also the file: `./data-raw/D030/supporting/2021-01-13_Variable_Dictionary_and_Disclaimer_national_weekly_data.pdf`. I stored this file also locally, because history shows that the ECDC is not very stable in it's accessibility policy.
+
 ```{r, echo=TRUE, results='hide'}
 ## Read data from public url to csv file
 data <- readr::read_csv(
-  "https://opendata.ecdc.europa.eu/covid19/casedistribution/csv/data.csv", 
+  "https://opendata.ecdc.europa.eu/covid19/nationalcasedeath/csv", 
   na = c("", " "))
 data
+
+
+## load vaccination data
+data_vac <- readr::read_csv(
+  "https://opendata.ecdc.europa.eu/covid19/vaccine_tracker/csv/data.csv", 
+  na = c("", " "))
+#data_vac
+
+# preprocess and clean data_vac
+data_vac <- data_vac %>%
+  separate(col = "YearWeekISO", into = c("year", "week"), sep = "-") %>%
+  mutate(
+    week = str_replace_all(
+      string = week, 
+      pattern = "W", 
+      replacement = "")) %>%
+  mutate(
+    date =
+      convert_week_to_date(x = week, y = year)
+  )
+
+# adding a month column 
+data_vac <- data_vac %>%
+  mutate(date_chr = as.character(date)) %>%
+  separate(date_chr, 
+           into = c("year2", "month", "day"), 
+           sep = "-",
+           remove = FALSE) %>%
+  mutate(month = as.integer(month)) %>%
+  rename(Code = ReportingCountry)
+
+
+## add country 
+#download.file("https://datahub.io/core/country-list/r/data.csv", 
+#              destfile = here::here(
+#                "data-raw", 
+#                "codes_countries"))
+data_country_codes <- read_csv(
+  "https://datahub.io/core/country-list/r/data.csv")
+
+## join
+data_vac <- left_join(data_vac, 
+                      data_country_codes) %>%
+  rename(country = Name) %>%
+  janitor::clean_names()
+
+
 ```
 
-## Selections
-```{r, results='asis'}
-m_names <- str_split(tolower(params$months_from_to), pattern = " ") %>% 
-    unlist() %>%
-    enframe() 
+## Convert week number to date
+We will do this in steps
 
-cat("The data was filtered for",
-firstupper(m_names$value[1]), "to", firstupper(m_names$value[2]), 
-"in", params$year)
+ 1. Split `year_week` column in `year` and `week`
+ 1. Convert week numbers to dates
+
+```{r}
+convert_week_to_date <- function(x, y){
+  map2(
+  x, 
+  y,
+  get_date) %>%
+  unlist() %>%
+  lubridate::as_date()
+
+}
+
+data_tidy <- data %>%
+  separate(col = "year_week", into = c("year", "week")) %>%
+  mutate(
+    date =
+      convert_week_to_date(x = week, y = year)
+  )
+
+data_tidy[c(1:4), "date"]
+
+# manual check confirms: week 1 of 2020 was  2019-12-30 to 2020-01-05
+# How can the ECDC be so stupid that they do not include a proper date column in their data? 
+data_tidy$date %>% unique()
+
+
+# adding a month column 
+data_tidy <- data_tidy %>%
+  mutate(date_chr = as.character(date)) %>%
+  separate(date_chr, 
+           into = c("year2", "month", "day"), 
+           sep = "-",
+           remove = FALSE) %>%
+  mutate(month = as.integer(month))
+
+
+
 ```
 
 ```{r, results='asis'}
-geo_ids <- str_split(string = params$geo_id, pattern = " ") %>% unlist()
+country_codes <- str_split(string = params$country_code, pattern = " ") %>% unlist()
 
 countries <- data %>%
-  dplyr::filter(geoId %in% geo_ids) %>%
-  dplyr::select(countriesAndTerritories) %>%
+  dplyr::filter(country_code %in% country_codes) %>%
+  dplyr::select(country) %>%
   unlist() %>%
   unique() %>%
   as.character()
@@ -68,53 +156,56 @@ cat("The data is displayed for", glue_collapse(countries, ", ", last = " and "))
 
 ## Data cleaning
 ```{r}
-data <- data %>%
-  mutate(
-    date = lubridate::dmy(dateRep),
-    ) %>%
-  separate(
-    col = date, 
-    into = c("year", "month", "day"), remove = FALSE) %>%
-  mutate(
-    month = as.integer(month)
-  )
+
+selected_dates <- str_split(string = params$from_to_date, pattern = " ") %>% unlist()
+
+date_sequence <- lubridate::as_date(selected_dates)
+
+all_dates <- c(date_sequence[1]:date_sequence[2]) %>% lubridate::as_date()
+
 
 ## Filter for `r params$month` and `r params$geo_id`
 ## create a conversion table to go from month name to month integer
-convert_months <- tibble(
-  month = c(
-    "january",
-    "february",
-    "march",
-    "april",
-    "may",
-    "june",
-    "july",
-    "august",
-    "september",
-    "october",
-    "november",
-    "december"),
-  month_number = c(1:12))
-
-  month_id <- convert_months %>%
-    dplyr::filter(
-      month %in% m_names$value) 
-id <- c(min(month_id$month_number): max(month_id$month_number))
-
-data_filter <- data %>%
-  dplyr::filter(
-    month %in% id,
-     geoId %in% geo_ids
-)
-  
-char_col <- map_lgl(
-  .x = data_filter,
-  .f = is.numeric 
-)
-
-country_names <- data_filter$countriesAndTerritories %>% unique() %>%
-  paste(collapse = ", ")
+# convert_months <- tibble(
+#   month = c(
+#     "january",
+#     "february",
+#     "march",
+#     "april",
+#     "may",
+#     "june",
+#     "july",
+#     "august",
+#     "september",
+#     "october",
+#     "november",
+#     "december"),
+#   month_number = c("01":"12"))
+# 
+#   month_id <- convert_months %>%
+#     dplyr::filter(
+#       month %in% m_names$value) 
+# id <- c(min(month_id$month_number): max(month_id$month_number))
+# 
+# ## supplement series
+# 
+# min(selected_years %>% as.numeric())
+# max(selected_years %>% as.numeric())
+# 
+# 
+# 
+data_filter <- data_tidy %>%
+  dplyr::filter(date %in% all_dates) %>%
+#  dplyr::filter(year %in% selected_years) %>%
+  dplyr::filter(country_code %in% country_codes)
+#   
+# char_col <- map_lgl(
+#   .x = data_filter,
+#   .f = is.numeric 
+# )
+# 
+# country_names <- data_filter$country %>% unique() %>%
+#   paste(collapse = ", ")
 
 Caps <- function(x) {
 s <- strsplit(x, " ")[[1]]
@@ -122,41 +213,42 @@ paste(toupper(substring(s, 1,1)), substring(s, 2),
 sep="", collapse=" ")
 }
 
-range <- data_filter$month %>% unique() %>% enframe() %>%
-  arrange(value)
+#range <- data_filter$month %>% unique() %>% enframe() %>%
+#  arrange(value)
 
-month_df <- left_join(range, convert_months, by = c("value" = "month_number")) %>%
-  dplyr::mutate(month = firstupper(month))
-
-min_month <- month_df %>%
-  dplyr::filter(value == min(month_df$value))
-
-countries_vec <- str_split(
-  country_names, 
-  pattern = ",", 
-  simplify = FALSE
-  ) %>%
-  unlist() %>%
-  trimws() %>%
-  blscrapeR::firstupper()  
-  
-
-max_month <- month_df %>%
-  dplyr::filter(value == max(month_df$value))
+#month_df <- left_join(range, convert_months, by = c("value" = "month_number")) %>%
+#  dplyr::mutate(month = firstupper(month))
+# 
+# min_month <- month_df %>%
+#   dplyr::filter(value == min(month_df$value))
+# 
+# countries_vec <- str_split(
+#   country_names, 
+#   pattern = ",", 
+#   simplify = FALSE
+#   ) %>%
+#   unlist() %>%
+#   trimws() %>%
+#   blscrapeR::firstupper()  
+#   
+# 
+# max_month <- month_df %>%
+#   dplyr::filter(value == max(month_df$value))
 
 cap_cases <- paste(
   "COVID-19 positive cases from", 
-  min_month$month, "to", max_month$month,
-  "for", glue_collapse(countries_vec, ", ", last = " and ")
+  selected_dates[1], "to", selected_dates[2],
+  "for", glue_collapse(countries, ", ", last = " and ")
 )
+cap_cases
 
 cap_deaths <- paste(
   "COVID-19 related deaths from", 
-  min_month$month, "to", max_month$month,
-  "for", glue_collapse(countries_vec, ", ", last = " and ")
+  selected_dates[1], "to", selected_dates[2],
+  "for", glue_collapse(countries, ", ", last = " and ")
 )
 
-
+cap_deaths
 data_filter  
 ```
 
@@ -165,14 +257,18 @@ data_filter
 #Sys.setlocale("LC_TIME", "English")Sys.setlocale("LC_TIME", "English")Sys.setlocale("LC_TIME", "English")
 plot_cases <- data_filter %>%
   na.omit() %>%
-  ggplot(aes(x = date, y = cases_weekly)) +
-  geom_point(aes(colour = geoId)) +
-  geom_line(aes(group = geoId, colour = geoId)) +
+  dplyr::filter(indicator == "cases") %>%
+  ggplot(aes(
+    x = date, 
+    y = weekly_count)) +
+  geom_point(aes(colour = country)) +
+  geom_line(aes(group = country, colour = country)) +
   xlab("Date") +
   ylab("COVID-19 positive tested cases") +
   scale_x_date(breaks="month", date_labels = "%b") +
   xlab(NULL) +
-  theme_bw()
+  theme_bw() +
+  toolboxr::rotate_axis_labels("x", 90) 
 
 plot_cases
 ```
@@ -183,18 +279,102 @@ plot_cases
 #Sys.setlocale("LC_TIME", "English")
 
 plot_deaths <- data_filter %>%
-  ggplot(aes(x = date, y = deaths_weekly)) +
-  geom_point(aes(colour = geoId)) +
-  geom_line(aes(group = geoId, colour = geoId))  +
+  na.omit() %>%
+  dplyr::filter(indicator == "deaths") %>%
+  ggplot(aes(
+    x = date, 
+    y = weekly_count)) +
+  geom_point(aes(colour = country)) +
+  geom_line(aes(group = country, colour = country)) +
   xlab("Date") +
-  ylab("COVID-19 related deaths") +
+  ylab("COVID-19 positive tested cases") +
   scale_x_date(breaks="month", date_labels = "%b") +
   xlab(NULL) +
-  theme_bw()
-
+  theme_bw() +
+  toolboxr::rotate_axis_labels("x", 90) 
 plot_deaths
+```
+
+## Vaccination - weekly
+```{r}
+
+   data_vaccination_total <- data_vac %>%
+      dplyr::filter(
+        # continent == input$continent,
+        country %in% countries) %>%
+      group_by(date) %>%
+      summarise(total = sum(number_doses_received))
+  
+data_vac %>%
+      dplyr::filter(
+       # continent == input$continent,
+        country %in% countries) %>%
+      group_by(country, date) %>%
+      summarise(total = sum(number_doses_received, na.rm = TRUE)) %>%
+      ggplot(
+        aes(
+          x = date,
+          y = total
+        )
+      ) +
+      geom_point(aes(colour = country), size = 2) +
+      scale_x_date(breaks="month", date_labels = "%b-%y") +
+      geom_line(aes(colour = country, group = country), size = 1) +
+      ggtitle(
+        paste("anti-SARS-CoV2 vaccinations", 
+              countries)) +
+      ylab("Total count per week") +
+      geom_line(
+        data = data_vaccination_total, 
+        colour = "darkred", 
+        size = 2, 
+        linetype = "dashed") +
+      scale_y_log10() +
+    #  toolboxr::rotate_axis_labels("x", 90) +
+      theme_bw() -> vaccination_plot
+    
+vaccination_plot  
+
+
+ind <- !is.na(data_vac$number_doses_received)
+
+data_vac_no_na <- data_vac[ind, ]
+
+## cummulative
+
+vaccination_plot_cumsum <- data_vac_no_na %>%
+  #    na.omit() %>%
+      dplyr::filter(
+        country %in% countries) %>%
+      group_by(country, date) %>%
+  summarize(total = sum(number_doses_received, na.rm = TRUE)) %>%
+      mutate(total_cummulative = cumsum(total)) %>%
+    #  group_by(country, date)
+    #  summarize(total = sum(total_cummlative)) %>%
+      ggplot(
+        aes(
+          x = date,
+          y = total_cummulative
+        )
+      ) +
+      geom_point(aes(colour = country),size = 2) +
+      scale_x_date(breaks="month", date_labels = "%b-%y") +
+      geom_line(aes(group = country, colour = country)) +
+      ggtitle(
+        paste("anti-SARS-CoV2 vaccinations", 
+              countries)) +
+      ylab("Total count per week") +
+      scale_y_log10() +
+    #  toolboxr::rotate_axis_labels("x", 90) +
+      theme_bw()
+
+vaccination_plot_cumsum
+
 
 ```
+
+
+
 
 ## Interactive plot
 ```{r, fig.height=25, fig.width=18, eval=FALSE}
