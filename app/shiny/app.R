@@ -189,7 +189,7 @@ App author: Marc A.T. Teunis, 2021 [CC-BY/NC]")
       ggtitle(
         paste("Cumulative anti-SARS-CoV2 vaccinations", 
               input$country)) +
-      ylab("Cumulative count")
+      ylab("Cumulative count") +
   #    scale_y_log10() +
       theme_bw()
     

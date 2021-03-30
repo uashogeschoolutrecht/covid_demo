@@ -5,9 +5,6 @@ library(shiny)
 library(maps)
 library(tidyverse)
 library(aweek)
-library()
-
-
 
 ## load case data
 data <- readr::read_csv(
