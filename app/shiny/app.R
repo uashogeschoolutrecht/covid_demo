@@ -65,11 +65,11 @@ the datasets, see:
 'https://www.ecdc.europa.eu/en/publications-data' 
 
 Legend to figures. 
-Figure A) Weekly reported cases
-Figure B) Weekly reported deaths
-Figure C) Weekly vaccinations for each vaccine, 
+A) Weekly reported cases
+B) Weekly reported deaths
+C) Weekly vaccinations for each vaccine, 
 the red dotted line is the total per week
-Figure D) Cumulative vaccinations
+D) Cumulative vaccinations
 
 Vaccine supplier and target group:
 COM = Comirnaty – Pfizer/BioNTech;
