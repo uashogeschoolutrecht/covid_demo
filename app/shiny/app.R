@@ -65,11 +65,11 @@ the datasets, see:
 'https://www.ecdc.europa.eu/en/publications-data' 
 
 Legend to figures. 
-Figure A) The number of weekly reported cases
-Figure B) The number of weekly reported deaths
-Figure C) The number of vaccinations for each vaccine, 
-the dotted line is the total per week
-Figure D) Total cumulative vaccinations
+Figure A) Weekly reported cases
+Figure B) Weekly reported deaths
+Figure C) Weekly vaccinations for each vaccine, 
+the red dotted line is the total per week
+Figure D) Cumulative vaccinations
 
 Vaccine supplier and target group:
 COM = Comirnaty – Pfizer/BioNTech;
@@ -189,7 +189,7 @@ App author: Marc A.T. Teunis, 2021 [CC-BY/NC]")
       ggtitle(
         paste("Cumulative anti-SARS-CoV2 vaccinations", 
               input$country)) +
-      ylab("Total cumulative count") +
+      ylab("Cumulative count")
   #    scale_y_log10() +
       theme_bw()
     
